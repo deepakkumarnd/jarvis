@@ -114,3 +114,36 @@ export const notesApi = {
 
   destroy: (id: number) => request<void>(`/api/notes/${id}`, { method: 'DELETE' }),
 }
+
+export type Todo = {
+  id: number
+  title: string
+  completed: boolean
+  /** ISO date (YYYY-MM-DD) or null */
+  due_on: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TodoInput = Partial<Pick<Todo, 'title' | 'completed' | 'due_on'>>
+
+export type TodoStatus = 'all' | 'active' | 'completed'
+
+export type TodoListMeta = PaginationMeta & {
+  status: TodoStatus
+  counts: Record<TodoStatus, number>
+}
+
+export const todosApi = {
+  list: (status: TodoStatus, page: number) =>
+    request<{ data: Todo[]; meta: TodoListMeta }>(`/api/todos?${new URLSearchParams({ status, page: String(page) })}`),
+
+  create: (input: TodoInput) => request<Todo>('/api/todos', { method: 'POST', body: JSON.stringify({ todo: input }) }),
+
+  update: (id: number, input: TodoInput) =>
+    request<Todo>(`/api/todos/${id}`, { method: 'PATCH', body: JSON.stringify({ todo: input }) }),
+
+  destroy: (id: number) => request<void>(`/api/todos/${id}`, { method: 'DELETE' }),
+
+  destroyCompleted: () => request<{ deleted: number }>('/api/todos/completed', { method: 'DELETE' }),
+}

@@ -5,6 +5,7 @@ const navItems = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/bookmarks', label: 'Bookmarks', end: false },
   { to: '/notes', label: 'Notes', end: false },
+  { to: '/todos', label: 'Todos', end: false },
 ]
 
 export function Layout() {

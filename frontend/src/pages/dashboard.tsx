@@ -1,10 +1,11 @@
-import { ArrowRight, Bookmark, CircleAlert, NotebookPen, RefreshCw, Server } from 'lucide-react'
+import { ArrowRight, Bookmark, CircleAlert, ListTodo, NotebookPen, RefreshCw, Server } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useBackendHealth } from '@/hooks/use-backend-health'
+import { useTodos } from '@/hooks/use-todos'
 
 export function DashboardPage() {
   return (
@@ -48,8 +49,33 @@ export function DashboardPage() {
             </Button>
           </CardContent>
         </Card>
+
+        <TodosCard />
       </div>
     </div>
+  )
+}
+
+function TodosCard() {
+  const { data } = useTodos('active', 1)
+  const open = data?.meta.counts.active
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ListTodo className="size-4" /> Todos
+        </CardTitle>
+        <CardDescription>{open === undefined ? 'Track what needs doing.' : open === 0 ? 'All caught up.' : `${open} open ${open === 1 ? 'todo' : 'todos'}.`}</CardDescription>
+      </CardHeader>
+      <CardContent className="mt-auto">
+        <Button asChild>
+          <Link to="/todos">
+            Open todos <ArrowRight data-icon="inline-end" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
   )
 }
 
