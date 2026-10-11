@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight, ExternalLink, Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { ExternalLink, Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import { useSearchParams } from 'react-router'
 import { BookmarkFormDialog } from '@/components/bookmark-form-dialog'
 import { DeleteBookmarkDialog } from '@/components/delete-bookmark-dialog'
+import { PaginationBar } from '@/components/pagination-bar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useBookmarks } from '@/hooks/use-bookmarks'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
-import type { Bookmark, PaginationMeta } from '@/lib/api'
+import type { Bookmark } from '@/lib/api'
 
 export function BookmarksPage() {
   // Search query and page live in the URL (?q=&page=) so they survive reloads and back/forward
@@ -145,7 +146,7 @@ export function BookmarksPage() {
         </Table>
       </div>
 
-      {data && data.meta.total_pages > 1 && <Pagination meta={data.meta} onPageChange={(p) => goTo({ page: p })} />}
+      {data && <PaginationBar meta={data.meta} onPageChange={(p) => goTo({ page: p })} />}
 
       <BookmarkFormDialog open={formOpen} onOpenChange={setFormOpen} bookmark={editing} />
       <DeleteBookmarkDialog bookmark={deleting} onOpenChange={(open) => !open && setDeleting(undefined)} />
@@ -160,29 +161,5 @@ function EmptyRow({ children }: { children: React.ReactNode }) {
         {children}
       </TableCell>
     </TableRow>
-  )
-}
-
-function Pagination({ meta, onPageChange }: { meta: PaginationMeta; onPageChange: (page: number) => void }) {
-  const first = (meta.page - 1) * meta.per_page + 1
-  const last = Math.min(meta.page * meta.per_page, meta.total_count)
-
-  return (
-    <div className="flex items-center justify-between gap-4 text-sm">
-      <p className="text-muted-foreground">
-        Showing {first}–{last} of {meta.total_count}
-      </p>
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" disabled={meta.page <= 1} onClick={() => onPageChange(meta.page - 1)}>
-          <ChevronLeft data-icon="inline-start" /> Previous
-        </Button>
-        <span className="tabular-nums">
-          Page {meta.page} of {meta.total_pages}
-        </span>
-        <Button variant="outline" size="sm" disabled={meta.page >= meta.total_pages} onClick={() => onPageChange(meta.page + 1)}>
-          Next <ChevronRight data-icon="inline-end" />
-        </Button>
-      </div>
-    </div>
   )
 }

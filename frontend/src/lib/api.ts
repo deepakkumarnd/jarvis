@@ -84,3 +84,33 @@ export const bookmarksApi = {
 
   destroy: (id: number) => request<void>(`/api/bookmarks/${id}`, { method: 'DELETE' }),
 }
+
+export type Note = {
+  id: number
+  title: string
+  /** Markdown */
+  body: string
+  created_at: string
+  updated_at: string
+}
+
+/** A note as returned by the list endpoint: a Markdown preview instead of the full body. */
+export type NoteSummary = Omit<Note, 'body'> & {
+  preview: string
+  truncated: boolean
+}
+
+export type NoteInput = Pick<Note, 'title' | 'body'>
+
+export const notesApi = {
+  list: (page: number) => request<Paginated<NoteSummary>>(`/api/notes?page=${page}`),
+
+  get: (id: number) => request<Note>(`/api/notes/${id}`),
+
+  create: (input: NoteInput) => request<Note>('/api/notes', { method: 'POST', body: JSON.stringify({ note: input }) }),
+
+  update: (id: number, input: NoteInput) =>
+    request<Note>(`/api/notes/${id}`, { method: 'PATCH', body: JSON.stringify({ note: input }) }),
+
+  destroy: (id: number) => request<void>(`/api/notes/${id}`, { method: 'DELETE' }),
+}

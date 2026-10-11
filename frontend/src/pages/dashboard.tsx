@@ -1,4 +1,4 @@
-import { ArrowRight, Bookmark, CircleAlert, RefreshCw, Server } from 'lucide-react'
+import { ArrowRight, Bookmark, CircleAlert, NotebookPen, RefreshCw, Server } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ export function DashboardPage() {
         <p className="text-sm text-muted-foreground">System status and quick links.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <BackendHealthCard />
 
         <Card>
@@ -28,6 +28,22 @@ export function DashboardPage() {
             <Button asChild>
               <Link to="/bookmarks">
                 Open bookmarks <ArrowRight data-icon="inline-end" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <NotebookPen className="size-4" /> Notes
+            </CardTitle>
+            <CardDescription>Write and read Markdown notes.</CardDescription>
+          </CardHeader>
+          <CardContent className="mt-auto">
+            <Button asChild>
+              <Link to="/notes">
+                Open notes <ArrowRight data-icon="inline-end" />
               </Link>
             </Button>
           </CardContent>

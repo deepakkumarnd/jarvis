@@ -59,7 +59,10 @@ function BookmarkForm({ bookmark, onDone }: { bookmark?: Bookmark; onDone: () =>
         <Input
           id="bookmark-name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value)
+            setErrors((prev) => ({ ...prev, name: undefined }))
+          }}
           placeholder="Rails Guides"
           aria-invalid={!!errors.name}
           autoFocus
@@ -70,7 +73,10 @@ function BookmarkForm({ bookmark, onDone }: { bookmark?: Bookmark; onDone: () =>
           id="bookmark-link"
           type="url"
           value={link}
-          onChange={(e) => setLink(e.target.value)}
+          onChange={(e) => {
+            setLink(e.target.value)
+            setErrors((prev) => ({ ...prev, link: undefined }))
+          }}
           placeholder="https://guides.rubyonrails.org"
           aria-invalid={!!errors.link}
         />

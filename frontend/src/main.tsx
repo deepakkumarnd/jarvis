@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { Layout } from '@/components/layout'
 import { Toaster } from '@/components/ui/sonner'
-import { BookmarksPage } from '@/pages/bookmarks'
 import { DashboardPage } from '@/pages/dashboard'
 import './index.css'
 
@@ -15,7 +14,12 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <DashboardPage /> },
-      { path: 'bookmarks', element: <BookmarksPage /> },
+      // Feature pages are code-split so the Markdown renderer only loads when needed
+      { path: 'bookmarks', lazy: () => import('@/pages/bookmarks').then((m) => ({ Component: m.BookmarksPage })) },
+      { path: 'notes', lazy: () => import('@/pages/notes').then((m) => ({ Component: m.NotesPage })) },
+      { path: 'notes/new', lazy: () => import('@/pages/note-editor').then((m) => ({ Component: m.NoteEditorPage })) },
+      { path: 'notes/:id', lazy: () => import('@/pages/note-view').then((m) => ({ Component: m.NoteViewPage })) },
+      { path: 'notes/:id/edit', lazy: () => import('@/pages/note-editor').then((m) => ({ Component: m.NoteEditorPage })) },
     ],
   },
 ])
