@@ -1,17 +1,19 @@
 class Api::BookmarksController < ApplicationController
+  include Paginatable
+
   before_action :set_bookmark, only: %i[ show update destroy ]
 
-  # GET /api/bookmarks
+  # GET /api/bookmarks?page=1
   def index
-    render json: Bookmark.order(created_at: :desc)
+    render_paginated Bookmark.order(created_at: :desc, id: :desc)
   end
 
-  # GET /api/bookmarks/search?q=term
+  # GET /api/bookmarks/search?q=term&page=1
   def search
     query = params[:q].to_s.strip
     return render json: { error: "q parameter is required" }, status: :bad_request if query.empty?
 
-    render json: Bookmark.search_by_name(query).order(:name)
+    render_paginated Bookmark.search_by_name(query).order(:name, :id)
   end
 
   # GET /api/bookmarks/:id
