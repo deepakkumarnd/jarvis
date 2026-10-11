@@ -7,5 +7,8 @@ Rails.application.routes.draw do
 
   # All endpoints consumed by the frontend live under /api (proxied by Vite in development)
   namespace :api do
+    resources :bookmarks do
+      get :search, on: :collection
+    end
   end
 end
