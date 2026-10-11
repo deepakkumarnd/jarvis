@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_11_171531) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_11_172413) do
   create_table "bookmarks", force: :cascade do |t|
     t.string "name", null: false
     t.string "link", null: false
@@ -25,5 +25,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_11_171531) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["updated_at"], name: "index_notes_on_updated_at"
+  end
+
+  create_table "todos", force: :cascade do |t|
+    t.string "title", null: false
+    t.boolean "completed", default: false, null: false
+    t.date "due_on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["completed", "due_on"], name: "index_todos_on_completed_and_due_on"
   end
 end

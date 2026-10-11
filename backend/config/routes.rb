@@ -11,5 +11,8 @@ Rails.application.routes.draw do
       get :search, on: :collection
     end
     resources :notes
+    resources :todos do
+      delete :completed, on: :collection, action: :destroy_completed
+    end
   end
 end
