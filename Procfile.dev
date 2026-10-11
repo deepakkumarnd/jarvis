@@ -1,0 +1,2 @@
+api: cd backend && bin/rails server -p 3000
+web: cd frontend && bun run dev

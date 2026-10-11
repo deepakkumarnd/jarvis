@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# One-time setup for a fresh clone.
+set -e
+
+echo "== Backend =="
+(cd backend && bundle install && bin/rails db:prepare)
+
+echo "== Frontend =="
+(cd frontend && bun install --frozen-lockfile)
+
+echo "Done. Run bin/dev to start both apps."

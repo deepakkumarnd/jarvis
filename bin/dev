@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Start backend (Rails, :3000) and frontend (Vite, :5173) together.
+
+if ! gem list foreman -i --silent; then
+  echo "Installing foreman..."
+  gem install foreman
+fi
+
+exec foreman start -f Procfile.dev --root . "$@"

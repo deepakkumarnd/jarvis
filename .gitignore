@@ -1,0 +1,11 @@
+# Repo-wide ignores; backend/ and frontend/ keep their own .gitignore files.
+
+# Environment files (commit .env.example instead)
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+*.swp
