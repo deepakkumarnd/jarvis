@@ -5,13 +5,14 @@ module Paginatable
 
   private
     # Renders one page of +scope+ as { data: [...], meta: { page, per_page, total_count, total_pages } }.
-    # Out-of-range pages return an empty data array.
-    def render_paginated(scope)
+    # Out-of-range pages return an empty data array. Pass a block to customise how each record is serialised.
+    def render_paginated(scope, &serialize)
       total_count = scope.count
       page = [ params[:page].to_i, 1 ].max
+      records = scope.limit(PER_PAGE).offset((page - 1) * PER_PAGE)
 
       render json: {
-        data: scope.limit(PER_PAGE).offset((page - 1) * PER_PAGE),
+        data: serialize ? records.map(&serialize) : records,
         meta: {
           page: page,
           per_page: PER_PAGE,

@@ -10,12 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_11_165406) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_11_171531) do
   create_table "bookmarks", force: :cascade do |t|
     t.string "name", null: false
     t.string "link", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_bookmarks_on_name"
+  end
+
+  create_table "notes", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "body", default: "", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["updated_at"], name: "index_notes_on_updated_at"
   end
 end

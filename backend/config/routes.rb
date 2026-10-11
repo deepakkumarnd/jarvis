@@ -10,5 +10,6 @@ Rails.application.routes.draw do
     resources :bookmarks do
       get :search, on: :collection
     end
+    resources :notes
   end
 end
