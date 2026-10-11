@@ -31,4 +31,5 @@ Requests from the frontend to `/api/*` are proxied by Vite to Rails, so use rela
 
 - Backend: `bundle add <gem>` inside `backend/`; commit `Gemfile.lock`.
 - Frontend: `bun add <pkg>` (or `bun add -d`) inside `frontend/`; commit `bun.lock`. Don't use npm/yarn here.
+- UI components: [shadcn/ui](https://ui.shadcn.com) — add one with `bunx --bun shadcn@latest add <component>` inside `frontend/` (files land in `src/components/ui/`).
 - CI installs with frozen lockfiles; Dependabot opens weekly update PRs for both.
