@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Start backend (Rails, :3000) and frontend (Vite, :5173) together.
+# Start backend (Rails, :8001) and frontend (Vite, :8000) together.
 
 if ! gem list foreman -i --silent; then
   echo "Installing foreman..."

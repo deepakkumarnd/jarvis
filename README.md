@@ -2,8 +2,8 @@
 
 | Directory   | Stack                          | Dev port |
 |-------------|--------------------------------|----------|
-| `backend/`  | Rails (API-only), Ruby 4.0.6   | 3000     |
-| `frontend/` | React + Vite + TypeScript, Bun | 5173     |
+| `backend/`  | Rails (API-only), Ruby 4.0.6   | 8001     |
+| `frontend/` | React + Vite + TypeScript, Bun | 8000     |
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ bin/setup
 bin/dev
 ```
 
-Starts both apps via `Procfile.dev` (installs `foreman` on first run). Open http://localhost:5173.
+Starts both apps via `Procfile.dev` (installs `foreman` on first run). Open http://localhost:8000.
 
 Requests from the frontend to `/api/*` are proxied by Vite to Rails, so use relative URLs
 (`fetch("/api/...")`) and put backend routes under `namespace :api` in `backend/config/routes.rb`.

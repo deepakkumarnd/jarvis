@@ -9,10 +9,11 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] })
   ],
   server: {
-    port: 5173,
+    port: 8000,
+    strictPort: true,
     // Forward API calls to Rails so the app can use relative URLs and avoid CORS in dev
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': 'http://localhost:8001',
     },
   },
 })
