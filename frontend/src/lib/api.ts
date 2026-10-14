@@ -367,3 +367,70 @@ export const documentsApi = {
   fileUrl: (id: number, fileId: number, { inline = false } = {}) =>
     `/api/documents/${id}/files/${fileId}/download${inline ? '?disposition=inline' : ''}`,
 }
+
+export type CredentialKind = 'username_password' | 'api_key' | 'secret_text'
+
+/** A credential as listed: identifying fields only (e.g. username); secret values are fetched on demand. */
+export type Credential = {
+  id: number
+  name: string
+  kind: CredentialKind
+  fields: Record<string, string>
+  secret_fields: string[]
+  created_at: string
+  updated_at: string
+}
+
+export type CredentialGroupSummary = {
+  id: number
+  name: string
+  credential_count: number
+  kinds: CredentialKind[]
+  credential_names: string[]
+  created_at: string
+  updated_at: string
+}
+
+export type CredentialGroup = {
+  id: number
+  name: string
+  credentials: Credential[]
+  created_at: string
+  updated_at: string
+}
+
+export type CredentialInput = { name: string; kind?: CredentialKind; fields: Record<string, string> }
+
+export const credentialsApi = {
+  listGroups: (query: string, page: number) =>
+    request<Paginated<CredentialGroupSummary>>(
+      `/api/credential_groups?${new URLSearchParams({ ...(query && { q: query }), page: String(page) })}`,
+    ),
+
+  getGroup: (id: number) => request<CredentialGroup>(`/api/credential_groups/${id}`),
+
+  createGroup: (name: string) =>
+    request<CredentialGroup>('/api/credential_groups', { method: 'POST', body: JSON.stringify({ credential_group: { name } }) }),
+
+  renameGroup: (id: number, name: string) =>
+    request<CredentialGroup>(`/api/credential_groups/${id}`, { method: 'PATCH', body: JSON.stringify({ credential_group: { name } }) }),
+
+  destroyGroup: (id: number) => request<void>(`/api/credential_groups/${id}`, { method: 'DELETE' }),
+
+  create: (groupId: number, input: CredentialInput) =>
+    request<Credential>(`/api/credential_groups/${groupId}/credentials`, { method: 'POST', body: JSON.stringify({ credential: input }) }),
+
+  /** Blank secret fields keep their current value. */
+  update: (groupId: number, id: number, input: CredentialInput) =>
+    request<Credential>(`/api/credential_groups/${groupId}/credentials/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ credential: input }),
+    }),
+
+  destroy: (groupId: number, id: number) => request<void>(`/api/credential_groups/${groupId}/credentials/${id}`, { method: 'DELETE' }),
+
+  /** The only call that returns secret values. Deliberately not cached anywhere. */
+  fetchSecrets: async (groupId: number, id: number) =>
+    (await request<{ id: number; secrets: Record<string, string> }>(`/api/credential_groups/${groupId}/credentials/${id}/secret`, { cache: 'no-store' }))
+      .secrets,
+}

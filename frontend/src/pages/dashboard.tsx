@@ -1,4 +1,4 @@
-import { ArrowRight, Bookmark, FileLock2, ListTodo, NotebookPen } from 'lucide-react'
+import { ArrowRight, Bookmark, FileLock2, KeyRound, ListTodo, NotebookPen } from 'lucide-react'
 import { Link } from 'react-router'
 import { SystemHealthSection } from '@/components/system-health'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ export function DashboardPage() {
         <p className="text-sm text-muted-foreground">Your apps and how the system is doing.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -59,6 +59,22 @@ export function DashboardPage() {
             <Button asChild>
               <Link to="/documents">
                 Open documents <ArrowRight data-icon="inline-end" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <KeyRound className="size-4" /> Credentials
+            </CardTitle>
+            <CardDescription>Passwords, API keys and secrets, encrypted.</CardDescription>
+          </CardHeader>
+          <CardContent className="mt-auto">
+            <Button asChild>
+              <Link to="/credentials">
+                Open credentials <ArrowRight data-icon="inline-end" />
               </Link>
             </Button>
           </CardContent>

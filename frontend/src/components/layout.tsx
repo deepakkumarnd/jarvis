@@ -7,6 +7,7 @@ const navItems = [
   { to: '/notes', label: 'Notes', end: false },
   { to: '/todos', label: 'Todos', end: false },
   { to: '/documents', label: 'Documents', end: false },
+  { to: '/credentials', label: 'Credentials', end: false },
 ]
 
 export function Layout() {
