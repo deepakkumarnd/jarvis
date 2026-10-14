@@ -50,6 +50,16 @@ decrypted tempfiles are deleted as soon as the download has been sent.
 **Back up `backend/config/master.key`** (it's git-ignored). Without it the credentials — and therefore
 every stored document — can't be decrypted. Tests use fixed test-only keys (`config/environments/test.rb`).
 
+## Credentials (secure store)
+
+Credential groups hold named credentials of three kinds, modelled with Rails `delegated_type`
+(a polymorphic `secretable` association): `UsernamePassword`, `ApiKeyPair` and `SecretText`.
+Every field is encrypted at rest with Active Record Encryption. List and detail responses include only
+identifiers (username, API key); passwords, secret keys and secret text are returned solely by
+`GET /api/credential_groups/:id/credentials/:id/secret` (`Cache-Control: no-store`) when you choose to
+view or copy them. The UI hides a revealed secret after 30s or when the tab is hidden, and these
+fields are filtered from the Rails logs.
+
 ## Dependencies
 
 - Backend: `bundle add <gem>` inside `backend/`; commit `Gemfile.lock`.

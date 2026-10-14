@@ -16,6 +16,11 @@ Rails.application.routes.draw do
         get :download, on: :member
       end
     end
+    resources :credential_groups, except: %i[ new edit ] do
+      resources :credentials, only: %i[ create update destroy ] do
+        get :secret, on: :member
+      end
+    end
     resources :todos do
       delete :completed, on: :collection, action: :destroy_completed
     end

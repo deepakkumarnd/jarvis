@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_14_040719) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_051838) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,12 +39,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_040719) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "api_key_pairs", force: :cascade do |t|
+    t.text "api_key", null: false
+    t.text "secret_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bookmarks", force: :cascade do |t|
     t.string "name", null: false
     t.string "link", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_bookmarks_on_name"
+  end
+
+  create_table "credential_groups", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_credential_groups_on_name"
+    t.index ["updated_at"], name: "index_credential_groups_on_updated_at"
+  end
+
+  create_table "credentials", force: :cascade do |t|
+    t.integer "credential_group_id", null: false
+    t.string "name", null: false
+    t.string "secretable_type", null: false
+    t.integer "secretable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["credential_group_id"], name: "index_credentials_on_credential_group_id"
+    t.index ["name"], name: "index_credentials_on_name"
+    t.index ["secretable_type", "secretable_id"], name: "index_credentials_on_secretable", unique: true
   end
 
   create_table "document_files", force: :cascade do |t|
@@ -76,6 +103,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_040719) do
     t.index ["updated_at"], name: "index_notes_on_updated_at"
   end
 
+  create_table "secret_texts", force: :cascade do |t|
+    t.text "secret", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "todos", force: :cascade do |t|
     t.string "title", null: false
     t.boolean "completed", default: false, null: false
@@ -85,7 +118,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_040719) do
     t.index ["completed", "due_on"], name: "index_todos_on_completed_and_due_on"
   end
 
+  create_table "username_passwords", force: :cascade do |t|
+    t.text "username", null: false
+    t.text "password", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "credentials", "credential_groups"
   add_foreign_key "document_files", "documents"
 end
