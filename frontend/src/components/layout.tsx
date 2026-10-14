@@ -6,6 +6,7 @@ const navItems = [
   { to: '/bookmarks', label: 'Bookmarks', end: false },
   { to: '/notes', label: 'Notes', end: false },
   { to: '/todos', label: 'Todos', end: false },
+  { to: '/documents', label: 'Documents', end: false },
 ]
 
 export function Layout() {
@@ -13,8 +14,9 @@ export function Layout() {
     <div className="min-h-svh bg-background">
       <header className="border-b">
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-6 px-4">
-          <span className="font-heading text-base font-semibold">Jarvis</span>
-          <nav className="flex items-center gap-4 text-sm">
+          <span className="shrink-0 font-heading text-base font-semibold">Jarvis</span>
+          {/* Scrolls sideways on narrow screens instead of widening the page */}
+          <nav className="-mx-1 flex min-w-0 items-center gap-4 overflow-x-auto px-1 text-sm whitespace-nowrap">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}

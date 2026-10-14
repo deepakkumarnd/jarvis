@@ -1,4 +1,4 @@
-import { ArrowRight, Bookmark, ListTodo, NotebookPen } from 'lucide-react'
+import { ArrowRight, Bookmark, FileLock2, ListTodo, NotebookPen } from 'lucide-react'
 import { Link } from 'react-router'
 import { SystemHealthSection } from '@/components/system-health'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ export function DashboardPage() {
         <p className="text-sm text-muted-foreground">Your apps and how the system is doing.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -47,6 +47,22 @@ export function DashboardPage() {
         </Card>
 
         <TodosCard />
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileLock2 className="size-4" /> Documents
+            </CardTitle>
+            <CardDescription>Encrypted file store with previews.</CardDescription>
+          </CardHeader>
+          <CardContent className="mt-auto">
+            <Button asChild>
+              <Link to="/documents">
+                Open documents <ArrowRight data-icon="inline-end" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       <SystemHealthSection />

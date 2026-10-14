@@ -21,6 +21,9 @@ const router = createBrowserRouter([
       { path: 'notes/:id', lazy: () => import('@/pages/note-view').then((m) => ({ Component: m.NoteViewPage })) },
       { path: 'notes/:id/edit', lazy: () => import('@/pages/note-editor').then((m) => ({ Component: m.NoteEditorPage })) },
       { path: 'todos', lazy: () => import('@/pages/todos').then((m) => ({ Component: m.TodosPage })) },
+      { path: 'documents', lazy: () => import('@/pages/documents').then((m) => ({ Component: m.DocumentsPage })) },
+      { path: 'documents/new', lazy: () => import('@/pages/document-new').then((m) => ({ Component: m.NewDocumentPage })) },
+      { path: 'documents/:id', lazy: () => import('@/pages/document-detail').then((m) => ({ Component: m.DocumentDetailPage })) },
     ],
   },
 ])

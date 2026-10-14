@@ -280,3 +280,90 @@ export const todosApi = {
 
   destroyCompleted: () => request<{ deleted: number }>('/api/todos/completed', { method: 'DELETE' }),
 }
+
+export const MAX_FILE_BYTES = 100 * 1024 * 1024
+export const MAX_FILE_LABEL = `${MAX_FILE_BYTES / 1024 / 1024} MB`
+export const MAX_FILES_PER_UPLOAD = 20
+
+export type PreviewKind = 'image' | 'pdf' | 'text'
+
+export type DocumentFileInfo = {
+  id: number
+  filename: string
+  content_type: string
+  byte_size: number
+  preview_kind: PreviewKind | null
+  created_at: string
+}
+
+export type DocumentSummary = {
+  id: number
+  name: string
+  file_count: number
+  total_bytes: number
+  content_types: string[]
+  filenames: string[]
+  created_at: string
+  updated_at: string
+}
+
+export type DocumentDetail = {
+  id: number
+  name: string
+  total_bytes: number
+  files: DocumentFileInfo[]
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * POSTs multipart form data with upload progress (fetch can't report upload progress).
+ * Rejects with ApiError, including field errors on 422.
+ */
+function uploadForm<T>(url: string, form: FormData, onProgress?: (fraction: number) => void): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', url)
+    xhr.setRequestHeader('Accept', 'application/json')
+    xhr.responseType = 'json'
+    xhr.upload.onprogress = (event) => event.lengthComputable && onProgress?.(event.loaded / event.total)
+    xhr.onload = () => {
+      const body = xhr.response ?? {}
+      if (xhr.status >= 200 && xhr.status < 300) resolve(body as T)
+      else reject(new ApiError(xhr.status, body.error ?? `Upload failed (${xhr.status})`, body.errors))
+    }
+    xhr.onerror = () => reject(new ApiError(0, 'Upload failed: network error'))
+    xhr.send(form)
+  })
+}
+
+export const documentsApi = {
+  list: (query: string, page: number) =>
+    request<Paginated<DocumentSummary>>(`/api/documents?${new URLSearchParams({ ...(query && { q: query }), page: String(page) })}`),
+
+  get: (id: number) => request<DocumentDetail>(`/api/documents/${id}`),
+
+  create: (name: string, files: File[], onProgress?: (fraction: number) => void) => {
+    const form = new FormData()
+    form.append('name', name)
+    files.forEach((file) => form.append('files[]', file))
+    return uploadForm<DocumentDetail>('/api/documents', form, onProgress)
+  },
+
+  addFiles: (id: number, files: File[], onProgress?: (fraction: number) => void) => {
+    const form = new FormData()
+    files.forEach((file) => form.append('files[]', file))
+    return uploadForm<DocumentDetail>(`/api/documents/${id}/files`, form, onProgress)
+  },
+
+  rename: (id: number, name: string) =>
+    request<DocumentDetail>(`/api/documents/${id}`, { method: 'PATCH', body: JSON.stringify({ document: { name } }) }),
+
+  destroy: (id: number) => request<void>(`/api/documents/${id}`, { method: 'DELETE' }),
+
+  deleteFile: (id: number, fileId: number) => request<DocumentDetail>(`/api/documents/${id}/files/${fileId}`, { method: 'DELETE' }),
+
+  /** Decrypting download URL; inline for previews. */
+  fileUrl: (id: number, fileId: number, { inline = false } = {}) =>
+    `/api/documents/${id}/files/${fileId}/download${inline ? '?disposition=inline' : ''}`,
+}
