@@ -102,8 +102,7 @@ class SystemMetrics
         mtu: read("#{sys}/mtu")&.to_i,
         speed_mbps: read("#{sys}/speed")&.to_i&.then { |s| s.positive? ? s : nil },
         loopback: iface[:name] == "lo",
-        # Bridges, veth pairs, tunnels etc. live under /sys/devices/virtual
-        virtual: virtual_interface?(sys),
+        virtual: self.class.virtual_interface?(iface[:name]),
         addresses: addresses[iface[:name]]
       )
     end
@@ -195,6 +194,13 @@ class SystemMetrics
       used_percent: total.positive? ? (used.to_f * 100 / (used.to_i + available.to_i)).round(1) : 0.0 }
   end
 
+  # Bridges, veth pairs, tunnels etc. live under /sys/devices/virtual
+  def self.virtual_interface?(name)
+    File.realpath("/sys/class/net/#{name}").include?("/devices/virtual/")
+  rescue SystemCallError
+    false
+  end
+
   def self.parse_proc_status(text)
     parse_meminfo(text.lines.grep(/\A(VmRSS|Threads):/).join)
   end
@@ -220,12 +226,6 @@ class SystemMetrics
     end
 
     def read!(path) = File.read(path)
-
-    def virtual_interface?(sys_path)
-      File.realpath(sys_path).include?("/devices/virtual/")
-    rescue SystemCallError
-      false
-    end
 
     def percent(part, total)
       total.to_i.positive? ? (part * 100.0 / total).round(1) : 0.0

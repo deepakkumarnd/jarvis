@@ -23,6 +23,7 @@ Rails.application.routes.draw do
         get :secret, on: :member
       end
     end
+    resources :network_devices, only: :index
     resources :todos do
       delete :completed, on: :collection, action: :destroy_completed
     end
