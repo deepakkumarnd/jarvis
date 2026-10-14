@@ -11,6 +11,11 @@ Rails.application.routes.draw do
       get :search, on: :collection
     end
     resources :notes
+    resources :documents, except: %i[ new edit ] do
+      resources :files, controller: "document_files", only: %i[ create destroy ] do
+        get :download, on: :member
+      end
+    end
     resources :todos do
       delete :completed, on: :collection, action: :destroy_completed
     end

@@ -37,6 +37,19 @@ In production metrics are withheld unless the request sends `X-Health-Token` mat
 `HEALTH_METRICS_TOKEN` environment variable, so host details aren't public. Metrics are read from
 `/proc` and `/sys`, so they're Linux-only; elsewhere those sections are `null`.
 
+## Documents (encrypted file store)
+
+Each uploaded file (max 100 MB, up to 20 per upload) is encrypted with its own random AES-256-GCM key
+before it's written to Active Storage (`backend/storage/`); only ciphertext is stored. Per-file keys are
+encrypted in the database with Active Record Encryption, whose keys live in `config/credentials.yml.enc`.
+Document names and file names/types/sizes stay in plaintext so they're searchable. Files are decrypted
+only when downloaded or previewed through the API, and their SHA-256 checksum is verified on every read.
+Encryption and decryption stream in 1 MB chunks through tempfiles, so large files don't sit in memory;
+decrypted tempfiles are deleted as soon as the download has been sent.
+
+**Back up `backend/config/master.key`** (it's git-ignored). Without it the credentials — and therefore
+every stored document — can't be decrypted. Tests use fixed test-only keys (`config/environments/test.rb`).
+
 ## Dependencies
 
 - Backend: `bundle add <gem>` inside `backend/`; commit `Gemfile.lock`.

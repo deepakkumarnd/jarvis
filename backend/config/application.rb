@@ -28,5 +28,9 @@ module Backend
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Document files are encrypted and only served (decrypted) through the API;
+    # don't expose Active Storage's own blob URLs.
+    config.active_storage.draw_routes = false
   end
 end
