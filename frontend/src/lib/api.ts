@@ -26,13 +26,26 @@ export type FieldErrors = Partial<Record<string, string[]>>
 export class ApiError extends Error {
   status: number
   fieldErrors: FieldErrors
+  body: Record<string, unknown>
 
-  constructor(status: number, message: string, fieldErrors: FieldErrors = {}) {
+  constructor(status: number, message: string, fieldErrors: FieldErrors = {}, body: Record<string, unknown> = {}) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.fieldErrors = fieldErrors
+    this.body = body
   }
+}
+
+let onUnauthorized: (() => void) | undefined
+
+/** Called whenever the API reports the session is missing or expired (except on the session endpoint itself). */
+export function setUnauthorizedHandler(handler: () => void) {
+  onUnauthorized = handler
+}
+
+function notifyUnauthorized(path: string, status: number) {
+  if (status === 401 && !path.startsWith('/api/session')) onUnauthorized?.()
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -43,7 +56,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}))
-    throw new ApiError(response.status, body.error ?? `Request failed (${response.status})`, body.errors)
+    notifyUnauthorized(path, response.status)
+    throw new ApiError(response.status, body.error ?? `Request failed (${response.status})`, body.errors, body)
   }
 
   return response.status === 204 ? (undefined as T) : response.json()
@@ -329,8 +343,9 @@ function uploadForm<T>(url: string, form: FormData, onProgress?: (fraction: numb
     xhr.upload.onprogress = (event) => event.lengthComputable && onProgress?.(event.loaded / event.total)
     xhr.onload = () => {
       const body = xhr.response ?? {}
-      if (xhr.status >= 200 && xhr.status < 300) resolve(body as T)
-      else reject(new ApiError(xhr.status, body.error ?? `Upload failed (${xhr.status})`, body.errors))
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(body as T)
+      notifyUnauthorized(url, xhr.status)
+      reject(new ApiError(xhr.status, body.error ?? `Upload failed (${xhr.status})`, body.errors, body))
     }
     xhr.onerror = () => reject(new ApiError(0, 'Upload failed: network error'))
     xhr.send(form)
@@ -445,4 +460,23 @@ export const settingsApi = {
   get: () => request<Settings>('/api/settings'),
   update: (input: Pick<Settings, 'brand_name' | 'tagline'>) =>
     request<Settings>('/api/settings', { method: 'PATCH', body: JSON.stringify({ setting: input }) }),
+}
+
+export type SessionInfo = { username: string; expires_at: string; signed_in_at: string }
+
+/** null when signed out; setupRequired when no user account exists yet. */
+export type SessionState = { signedIn: true; session: SessionInfo } | { signedIn: false; setupRequired: boolean }
+
+export const sessionApi = {
+  get: async (): Promise<SessionState> => {
+    try {
+      return { signedIn: true, session: await request<SessionInfo>('/api/session') }
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) return { signedIn: false, setupRequired: error.body.setup_required === true }
+      throw error
+    }
+  },
+  signIn: (username: string, password: string) =>
+    request<SessionInfo>('/api/session', { method: 'POST', body: JSON.stringify({ username, password }) }),
+  signOut: () => request<void>('/api/session', { method: 'DELETE' }),
 }

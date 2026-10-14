@@ -1,10 +1,13 @@
 import { useState, type FormEvent } from 'react'
+import { LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useSession, useSignOut } from '@/hooks/use-session'
 import { useSettings, useUpdateSettings } from '@/hooks/use-settings'
 import { ApiError, type FieldErrors, type Settings } from '@/lib/api'
 import { formatDateTime } from '@/lib/format'
@@ -26,6 +29,7 @@ export function SettingsPage() {
         // Keyed by updated_at so the form resets to the saved values after each save
         <BrandingForm key={settings.updated_at} settings={settings} />
       )}
+      <AccountCard />
     </div>
   )
 }
@@ -118,6 +122,31 @@ function BrandingForm({ settings }: { settings: Settings }) {
             </Button>
           </div>
         </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+function AccountCard() {
+  const navigate = useNavigate()
+  const { data } = useSession()
+  const signOut = useSignOut()
+  if (!data?.signedIn) return null
+  const { session } = data
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Account</CardTitle>
+        <CardDescription>
+          Signed in as <span className="font-medium text-foreground">{session.username}</span> since {formatDateTime(session.signed_in_at)}. This
+          session expires {formatDateTime(session.expires_at)}.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Button variant="outline" onClick={() => signOut.mutate(undefined, { onSettled: () => navigate('/login', { replace: true }) })} disabled={signOut.isPending}>
+          <LogOut data-icon="inline-start" /> {signOut.isPending ? 'Logging out…' : 'Log out'}
+        </Button>
       </CardContent>
     </Card>
   )

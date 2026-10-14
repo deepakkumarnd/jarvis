@@ -19,10 +19,12 @@ export default defineConfig({
   server: {
     port: 8000,
     strictPort: true,
-    // Forward API calls and the Rails health check to Rails so the app can use relative URLs and avoid CORS in dev
+    // Forward API calls and the Rails health check to Rails so the app can use relative URLs and avoid CORS in dev.
+    // changeOrigin: false keeps the browser's Host header, so Rails sees the same origin as the page
+    // (its CSRF protection compares the Origin header against it, and session cookies stay same-site).
     proxy: {
-      '/api': 'http://localhost:8001',
-      '/up': 'http://localhost:8001',
+      '/api': { target: 'http://localhost:8001', changeOrigin: false },
+      '/up': { target: 'http://localhost:8001', changeOrigin: false },
     },
   },
 })

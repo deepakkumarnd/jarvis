@@ -3,15 +3,27 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { Layout } from '@/components/layout'
+import { RequireAuth } from '@/components/require-auth'
 import { Toaster } from '@/components/ui/sonner'
+import { resetToSignedOut } from '@/hooks/use-session'
+import { setUnauthorizedHandler } from '@/lib/api'
 import { DashboardPage } from '@/pages/dashboard'
+import { LoginPage } from '@/pages/login'
 import './index.css'
 
 const queryClient = new QueryClient()
 
+// Any 401 (e.g. the month-long session expired mid-use) drops cached data and shows the login page
+setUnauthorizedHandler(() => resetToSignedOut(queryClient))
+
 const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
   {
-    element: <Layout />,
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <DashboardPage /> },
       // Feature pages are code-split so the Markdown renderer only loads when needed
