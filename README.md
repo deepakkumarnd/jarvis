@@ -157,10 +157,51 @@ bin/dev
 Starts both apps via `Procfile.dev` (installs `foreman` on first run). Open http://localhost:8000 and
 sign in.
 
+## Deploy on your home network (nginx + HTTPS)
+
+Production runs on this machine as a systemd service (Puma on `127.0.0.1:3000`) behind nginx, which
+serves the built frontend and terminates HTTPS. The certificate comes from a local certificate
+authority made with [mkcert](https://github.com/FiloSottile/mkcert), and nginx only answers devices on
+private (home) networks.
+
+**First time**, from the repo root as your normal user (it asks for your sudo password):
+
+```sh
+deploy/setup.sh
+```
+
+It installs mkcert, creates and trusts the local CA, issues a certificate for
+`<hostname>.local`, the LAN IP and `localhost`, offers to copy your development data into production,
+builds and publishes the frontend to `/var/www/jarvis`, installs the `jarvis` systemd service and the
+nginx site, and checks `https://…/up`. Override the names with
+`SERVER_NAMES="jarvis.local 192.168.1.48 localhost" deploy/setup.sh`.
+
+**Updates** after pulling or committing changes (no sudo):
+
+```sh
+bin/deploy
+```
+
+**Other devices** must trust the local CA once: install `$(mkcert -CAROOT)/rootCA.pem` as a trusted
+root/CA certificate (the setup script prints per-platform steps). Never share `rootCA-key.pem`.
+Devices reach the app at `https://<hostname>.local` via mDNS (Avahi), or by IP.
+
+| What | Where |
+|---|---|
+| Service | `sudo systemctl status jarvis`, logs: `journalctl -u jarvis -f` |
+| nginx site | `/etc/nginx/sites-available/jarvis`, snippets in `/etc/nginx/snippets/jarvis-*.conf` |
+| Certificate | `/etc/nginx/ssl/jarvis.{crt,key}` (re-run `deploy/setup.sh` to renew; mkcert certificates last about 2 years) |
+| Production data | `backend/storage/production*.sqlite3` and `backend/storage/production_files/` |
+
+Production keeps its own database and document files, separate from development's, so you can keep
+developing with `bin/dev` (ports 8000/8001) without touching production. Uploads stream through nginx
+without being spooled to disk, and decrypted downloads are never written to nginx's temporary files.
+
 ## Data and encryption
 
-- **Database and files** live in `backend/storage/` (SQLite plus Active Storage blobs). This folder is
-  git-ignored, so it holds the only copy of your data.
+- **Database and files** live in `backend/storage/` (SQLite plus Active Storage blobs; production uses
+  `production*.sqlite3` and `production_files/`). This folder is git-ignored, so it holds the only copy
+  of your data.
 - **Documents:** each file is encrypted with its own random AES-256-GCM key before it's written to
   Active Storage; only ciphertext is stored. Per-file keys are encrypted in the database with Active
   Record Encryption. Files are decrypted only when downloaded or previewed, and their SHA-256 checksum
@@ -178,10 +219,11 @@ sign in.
 
 ### Moving to another computer
 
-1. Stop the app (SQLite runs in WAL mode, so copy only while it's stopped).
+1. Stop the app (`sudo systemctl stop jarvis` and `bin/dev`); SQLite runs in WAL mode, so copy only
+   while it's stopped.
 2. Copy the code, `backend/storage/` and `backend/config/master.key` (keep the key private:
    `chmod 600`).
-3. On the new machine, install Ruby and Bun, run `bin/setup`, then `bin/dev`.
+3. On the new machine, install Ruby, Bun and nginx, run `bin/setup`, then `deploy/setup.sh`.
 
 ## Health check
 

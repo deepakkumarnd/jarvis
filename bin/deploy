@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Builds and (re)deploys Jarvis in production on this machine. No sudo needed after deploy/setup.sh.
+#   bin/deploy            build frontend, update gems, migrate, restart Rails
+#   bin/deploy --no-restart
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+WEB_ROOT="${WEB_ROOT:-/var/www/jarvis}"
+RESTART=1
+[[ "${1:-}" == "--no-restart" ]] && RESTART=0
+
+echo "== Backend: gems and database (production)"
+cd "$ROOT/backend"
+bundle install --quiet
+RAILS_ENV=production bin/rails db:prepare
+
+echo "== Frontend: build"
+cd "$ROOT/frontend"
+bun install --frozen-lockfile
+bun run build
+
+echo "== Frontend: publish to $WEB_ROOT"
+[[ -w "$WEB_ROOT" ]] || { echo "Can't write to $WEB_ROOT — run deploy/setup.sh first." >&2; exit 1; }
+rsync -a --delete "$ROOT/frontend/dist/" "$WEB_ROOT/"
+
+if (( RESTART )); then
+  if systemctl is-active --quiet jarvis; then
+    echo "== Restarting Rails (Puma restarts in place)"
+    touch "$ROOT/backend/tmp/restart.txt"
+  else
+    echo "== jarvis service isn't running; start it with: sudo systemctl start jarvis"
+  fi
+fi
+echo "Done."

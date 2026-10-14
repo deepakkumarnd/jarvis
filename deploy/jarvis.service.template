@@ -1,0 +1,31 @@
+# Jarvis Rails API (Puma) — generated from deploy/jarvis.service.template by deploy/setup.sh
+[Unit]
+Description=Jarvis (Rails API behind nginx)
+After=network.target
+
+[Service]
+Type=simple
+User=@@USER@@
+Group=@@GROUP@@
+WorkingDirectory=@@APP_DIR@@/backend
+Environment=RAILS_ENV=production
+Environment=BIND_HOST=127.0.0.1
+Environment=PORT=@@APP_PORT@@
+# Quoted: the value contains spaces, which systemd would otherwise split into separate assignments
+Environment="APP_HOSTS=@@SERVER_NAMES@@"
+Environment=SOLID_QUEUE_IN_PUMA=1
+Environment=RAILS_LOG_LEVEL=info
+ExecStart=@@RUBY_WRAPPERS@@/bundle exec puma -C config/puma.rb
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+
+# Hardening: read-only system and home, writable only where Rails needs it
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=@@APP_DIR@@/backend/storage @@APP_DIR@@/backend/log @@APP_DIR@@/backend/tmp
+
+[Install]
+WantedBy=multi-user.target

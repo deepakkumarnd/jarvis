@@ -1,0 +1,74 @@
+# Jarvis behind nginx with TLS. Generated from deploy/nginx-jarvis.conf.template by deploy/setup.sh.
+# @@VARS@@ are filled in by the script; $vars are nginx variables.
+
+# Plain HTTP only redirects to HTTPS
+server {
+    listen @@HTTP_PORT@@;
+    listen [::]:@@HTTP_PORT@@;
+    server_name @@SERVER_NAMES@@;
+    include @@ACCESS_INCLUDE@@;
+
+    return 301 https://$host@@HTTPS_PORT_SUFFIX@@$request_uri;
+}
+
+server {
+    listen @@HTTPS_PORT@@ ssl;
+    listen [::]:@@HTTPS_PORT@@ ssl;
+    http2 on;
+    server_name @@SERVER_NAMES@@;
+    include @@ACCESS_INCLUDE@@;
+
+    ssl_certificate     @@SSL_CERT@@;
+    ssl_certificate_key @@SSL_KEY@@;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:jarvis_ssl:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # Security headers for every response (always = also on errors)
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "same-origin" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+
+    # Documents allow up to 20 files of 100 MB per upload
+    client_max_body_size 2100m;
+
+    # Built frontend (React single-page app)
+    root @@WEB_ROOT@@;
+    index index.html;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # Fingerprinted build assets never change
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        add_header Strict-Transport-Security "max-age=31536000" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    # API and health check go to Rails (Puma on localhost)
+    location /api/ {
+        proxy_pass http://127.0.0.1:@@APP_PORT@@;
+        include @@PROXY_INCLUDE@@;
+    }
+    location = /up {
+        proxy_pass http://127.0.0.1:@@APP_PORT@@;
+        include @@PROXY_INCLUDE@@;
+    }
+
+    # Everything else is the app shell; client-side routes fall back to index.html
+    location / {
+        try_files $uri /index.html;
+        add_header Cache-Control "no-cache" always;
+        add_header Strict-Transport-Security "max-age=31536000" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "same-origin" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'" always;
+    }
+}
