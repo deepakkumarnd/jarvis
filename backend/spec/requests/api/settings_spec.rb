@@ -7,7 +7,7 @@ RSpec.describe "Api::Settings", type: :request do
     get api_settings_path, as: :json
 
     expect(response).to have_http_status(:ok)
-    expect(json).to include("brand_name" => "Namnik", "tagline" => "Personal assistant for Deepak")
+    expect(json).to include("brand_name" => "Jarvis", "tagline" => "Personal assistant for Deepak")
     expect(json.keys).to contain_exactly("brand_name", "tagline", "updated_at")
   end
 

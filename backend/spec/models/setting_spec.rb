@@ -4,7 +4,7 @@ RSpec.describe Setting, type: :model do
   describe ".current" do
     it "creates the row with defaults on first use" do
       expect { described_class.current }.to change(described_class, :count).from(0).to(1)
-      expect(described_class.current).to have_attributes(brand_name: "Namnik", tagline: "Personal assistant for Deepak")
+      expect(described_class.current).to have_attributes(brand_name: "Jarvis", tagline: "Personal assistant for Deepak")
     end
 
     it "returns the same row afterwards" do

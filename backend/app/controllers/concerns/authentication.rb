@@ -6,7 +6,7 @@
 module Authentication
   extend ActiveSupport::Concern
 
-  COOKIE_NAME = :namnik_session
+  COOKIE_NAME = :jarvis_session
 
   included do
     before_action :verify_same_origin, unless: -> { request.get? || request.head? }

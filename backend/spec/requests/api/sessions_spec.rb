@@ -13,7 +13,7 @@ RSpec.describe "Authentication", type: :request do
 
         expect(response).to have_http_status(:created)
         expect(json).to include("username" => "deepak", "expires_at" => 1.month.from_now.as_json)
-        expect(session_cookie).to include("namnik_session=").and include("httponly").and include("samesite=lax")
+        expect(session_cookie).to include("jarvis_session=").and include("httponly").and include("samesite=lax")
         expect(Session.count).to eq(1)
       end
     end
@@ -29,7 +29,7 @@ RSpec.describe "Authentication", type: :request do
 
       expect(response).to have_http_status(:unauthorized)
       expect(json["error"]).to eq("Incorrect username or password")
-      expect(session_cookie).not_to include("namnik_session=")
+      expect(session_cookie).not_to include("jarvis_session=")
     end
 
     it "rejects an unknown user with the same message" do

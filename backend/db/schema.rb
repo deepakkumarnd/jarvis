@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_14_054730) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_061024) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -123,7 +123,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_054730) do
   end
 
   create_table "settings", force: :cascade do |t|
-    t.string "brand_name", default: "Namnik", null: false
+    t.string "brand_name", default: "Jarvis", null: false
     t.string "tagline", default: "Personal assistant for Deepak", null: false
     t.integer "singleton_guard", default: 0, null: false
     t.datetime "created_at", null: false
