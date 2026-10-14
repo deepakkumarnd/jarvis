@@ -137,4 +137,23 @@
   html {
     @apply font-sans;
     }
+  /* Pointer cursor on everything clickable (Tailwind v4 resets buttons to the default arrow) */
+  a[href],
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"]:not([aria-disabled="true"]),
+  [role="checkbox"]:not(:disabled),
+  [role="menuitem"]:not([data-disabled]),
+  label[for],
+  summary,
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled) {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }
