@@ -1,4 +1,8 @@
-# Jarvis
+# Namnik
+
+_Personal assistant for Deepak._
+
+Codename **jarvis** (repository and directory names); everything user-facing is branded Namnik.
 
 | Directory   | Stack                          | Dev port |
 |-------------|--------------------------------|----------|

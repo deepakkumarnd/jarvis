@@ -434,3 +434,15 @@ export const credentialsApi = {
     (await request<{ id: number; secrets: Record<string, string> }>(`/api/credential_groups/${groupId}/credentials/${id}/secret`, { cache: 'no-store' }))
       .secrets,
 }
+
+export type Settings = {
+  brand_name: string
+  tagline: string
+  updated_at: string
+}
+
+export const settingsApi = {
+  get: () => request<Settings>('/api/settings'),
+  update: (input: Pick<Settings, 'brand_name' | 'tagline'>) =>
+    request<Settings>('/api/settings', { method: 'PATCH', body: JSON.stringify({ setting: input }) }),
+}

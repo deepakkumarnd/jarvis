@@ -26,6 +26,7 @@ const router = createBrowserRouter([
       { path: 'documents/:id', lazy: () => import('@/pages/document-detail').then((m) => ({ Component: m.DocumentDetailPage })) },
       { path: 'credentials', lazy: () => import('@/pages/credentials').then((m) => ({ Component: m.CredentialsPage })) },
       { path: 'credentials/:id', lazy: () => import('@/pages/credential-group').then((m) => ({ Component: m.CredentialGroupPage })) },
+      { path: 'settings', lazy: () => import('@/pages/settings').then((m) => ({ Component: m.SettingsPage })) },
     ],
   },
 ])
