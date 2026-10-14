@@ -1,5 +1,6 @@
 import { ArrowRight, Bookmark, FileLock2, KeyRound, ListTodo, NotebookPen } from 'lucide-react'
 import { Link } from 'react-router'
+import { NetworkDevicesSection } from '@/components/network-devices'
 import { SystemHealthSection } from '@/components/system-health'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,7 +11,7 @@ export function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Your apps and how the system is doing.</p>
+        <p className="text-sm text-muted-foreground">Your apps, how the system is doing and what's on your network.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -82,6 +83,8 @@ export function DashboardPage() {
       </div>
 
       <SystemHealthSection />
+
+      <NetworkDevicesSection />
     </div>
   )
 }

@@ -232,6 +232,33 @@ export const bookmarksApi = {
   destroy: (id: number) => request<void>(`/api/bookmarks/${id}`, { method: 'DELETE' }),
 }
 
+export type NetworkDevice = {
+  ip: string
+  mac: string
+  /** From the router's DNS or multicast DNS; null when the device doesn't announce one. */
+  hostname: string | null
+  /** From the IEEE OUI list (ieee-data package); null when unknown or the MAC is private. */
+  vendor: string | null
+  interface: string
+  /** Locally administered ("private Wi-Fi") MAC, as used by phones. */
+  randomized: boolean
+  gateway: boolean
+  self: boolean
+}
+
+export type NetworkScan = {
+  scanned_at: string
+  duration_ms: number
+  /** ssid is the Wi-Fi network name; null on wired networks or without NetworkManager. */
+  networks: { interface: string; address: string; cidr: string; ssid: string | null }[]
+  devices: NetworkDevice[]
+}
+
+export const networkApi = {
+  /** Devices on the LAN; the backend caches a scan for 30s unless refresh is set. */
+  devices: (refresh = false) => request<NetworkScan>(`/api/network_devices${refresh ? '?refresh=1' : ''}`),
+}
+
 export type Note = {
   id: number
   title: string

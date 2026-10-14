@@ -14,7 +14,7 @@ sign in, before the account is set up, and while settings load.
 | Area | What you can do |
 |---|---|
 | [Sign-in](#sign-in-and-security) | Single-user username/password login; sessions last a month; everything else is behind it |
-| [Dashboard](#dashboard-and-system-health) | Quick links to every app and live system health: CPU, memory, disk, network, process |
+| [Dashboard](#dashboard-and-system-health) | Quick links to every app and live system health: CPU, memory, disk, network, process; devices on your network |
 | [Bookmarks](#bookmarks) | Save named links; list, search, edit and delete |
 | [Notes](#notes) | Markdown notes with a formatting toolbar, live preview and rich rendering |
 | [Todos](#todos) | Tasks with due dates, filters, inline editing and undo |
@@ -48,6 +48,18 @@ sign in, before the account is set up, and while settings load.
     Virtual interfaces (Docker bridges, veth) are hidden behind a toggle.
   - Host (OS, kernel, architecture, uptime) and the Rails process (memory, threads, uptime, database
     latency).
+- **Network devices**, rescanned every minute or on demand with **Scan now**:
+  - The header shows the Wi-Fi network (SSID) the server is connected to, read from NetworkManager,
+    or the interface name on a wired network.
+  - Every device on the server's Wi-Fi/Ethernet network, with hostname, IP address, MAC address and
+    vendor. The router and this server are labelled, and so are private (randomised) MACs, which
+    phones use.
+  - Found without root: Jarvis sends one empty UDP packet to each address on the subnet, so the
+    kernel ARPs for it, then reads the neighbour table. Docker bridges and VPNs are skipped, as are
+    subnets larger than /22. Devices that are asleep may not show until they wake.
+  - Hostnames come from the router's DNS, then multicast DNS (Apple devices, many Android and
+    smart-home devices, Linux with Avahi). For vendor names, install the IEEE list:
+    `sudo apt install ieee-data`.
 
 ### Bookmarks
 
