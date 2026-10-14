@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useBrand } from '@/hooks/use-brand'
 import { useSession, useSignIn } from '@/hooks/use-session'
 
 /** Only allow redirects to paths within this app (no //evil.com or absolute URLs). */
@@ -17,6 +18,7 @@ export function LoginPage() {
   const [searchParams] = useSearchParams()
   const next = safeNext(searchParams.get('next'))
   const { data: session } = useSession()
+  const { brandName } = useBrand()
   const signIn = useSignIn()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -46,7 +48,7 @@ export function LoginPage() {
           <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Lock className="size-5" />
           </div>
-          <CardTitle className="text-xl">Sign in</CardTitle>
+          <CardTitle className="text-xl">Sign in to {brandName}</CardTitle>
           <CardDescription>This is a private system. Sign in to continue.</CardDescription>
         </CardHeader>
         <CardContent>

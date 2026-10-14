@@ -1,9 +1,8 @@
-import { useEffect } from 'react'
 import { Settings } from 'lucide-react'
 import { Link, NavLink, Outlet } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useSettings } from '@/hooks/use-settings'
+import { useBrand } from '@/hooks/use-brand'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -50,22 +49,16 @@ export function Layout() {
   )
 }
 
-/** Brand name and tagline from the settings record; also keeps the tab title and description in sync. */
+/** Brand name and tagline from the settings record (fallback until available). */
 function Brand() {
-  const { data: settings } = useSettings()
+  const { brandName, tagline, loading } = useBrand()
 
-  useEffect(() => {
-    if (!settings) return
-    document.title = settings.brand_name
-    document.querySelector('meta[name="description"]')?.setAttribute('content', [settings.brand_name, settings.tagline].filter(Boolean).join(' — '))
-  }, [settings])
-
-  if (!settings) return <Skeleton className="h-5 w-20 shrink-0" />
+  if (loading) return <Skeleton className="h-5 w-20 shrink-0" />
 
   return (
-    <Link to="/" className="flex shrink-0 flex-col leading-tight" aria-label={`${settings.brand_name} home`}>
-      <span className="font-heading text-base font-semibold">{settings.brand_name}</span>
-      {settings.tagline && <span className="hidden text-[11px] text-muted-foreground md:block">{settings.tagline}</span>}
+    <Link to="/" className="flex shrink-0 flex-col leading-tight" aria-label={`${brandName} home`}>
+      <span className="font-heading text-base font-semibold">{brandName}</span>
+      {tagline && <span className="hidden text-[11px] text-muted-foreground md:block">{tagline}</span>}
     </Link>
   )
 }

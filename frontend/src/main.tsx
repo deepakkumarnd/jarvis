@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import { Layout } from '@/components/layout'
 import { RequireAuth } from '@/components/require-auth'
 import { Toaster } from '@/components/ui/sonner'
+import { BrandDocumentHead } from '@/hooks/use-brand'
 import { resetToSignedOut } from '@/hooks/use-session'
 import { setUnauthorizedHandler } from '@/lib/api'
 import { DashboardPage } from '@/pages/dashboard'
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
+      <BrandDocumentHead />
       <RouterProvider router={router} />
       <Toaster richColors />
     </QueryClientProvider>
