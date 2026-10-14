@@ -69,6 +69,8 @@ jobs:
     #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Install packages
+        # Runs before checkout, so backend/ (the default working directory) doesn't exist yet
+        working-directory: .
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
 
       - name: Checkout code
