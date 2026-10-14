@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_14_051838) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_053809) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -107,6 +107,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_051838) do
     t.text "secret", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "settings", force: :cascade do |t|
+    t.string "brand_name", default: "Namnik", null: false
+    t.string "tagline", default: "Personal assistant for Deepak", null: false
+    t.integer "singleton_guard", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["singleton_guard"], name: "index_settings_on_singleton_guard", unique: true
   end
 
   create_table "todos", force: :cascade do |t|
