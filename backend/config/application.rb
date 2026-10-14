@@ -32,5 +32,8 @@ module Backend
     # Document files are encrypted and only served (decrypted) through the API;
     # don't expose Active Storage's own blob URLs.
     config.active_storage.draw_routes = false
+
+    # Session cookies for authentication (API-only apps don't include this middleware by default)
+    config.middleware.use ActionDispatch::Cookies
   end
 end

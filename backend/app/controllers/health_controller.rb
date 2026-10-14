@@ -1,10 +1,11 @@
 # GET /up - health check for load balancers (Kamal) and the dashboard.
 #
-# Responds 200 when the app and database are healthy, 503 otherwise. In development
-# and test the response includes host metrics (CPU, memory, disk, network, process).
-# In production metrics are only included when the request carries the token from
+# Public, so load balancers (Kamal) can use it: responds 200 when the app and database
+# are healthy, 503 otherwise. Host metrics (CPU, memory, disk, network, process) are
+# only included for a signed-in user, or in production for a request carrying the
 # HEALTH_METRICS_TOKEN (X-Health-Token header), so host details aren't public.
 class HealthController < ApplicationController
+  allow_unauthenticated_access
   def show
     database = database_check
     healthy = database[:status] == "ok"
@@ -25,7 +26,7 @@ class HealthController < ApplicationController
     end
 
     def include_metrics?
-      return true if Rails.env.local?
+      return true if authenticated?
 
       token = ENV["HEALTH_METRICS_TOKEN"]
       token.present? && ActiveSupport::SecurityUtils.secure_compare(request.headers["X-Health-Token"].to_s, token)

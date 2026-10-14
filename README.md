@@ -20,6 +20,21 @@ Codename **jarvis** (repository and directory names); everything user-facing is 
 bin/setup
 ```
 
+## Account (sign-in)
+
+Everything except the bare `/up` health status requires signing in. It's a single-user system;
+create the account once from the `backend/` folder:
+
+```sh
+bin/rails auth:create_user        # prompts for username and password (min 10 characters)
+bin/rails auth:reset_password     # new password; signs out every session
+bin/rails auth:sign_out_everywhere
+```
+
+Sessions last a month (fixed from sign-in) and live in an httpOnly, SameSite=Lax cookie (Secure over
+HTTPS); only a SHA-256 digest of the session token is stored. Sign-in is rate limited (10 attempts per
+3 minutes per IP), and state-changing requests from other origins are rejected. Log out from Settings.
+
 ## Run
 
 ```sh
@@ -34,11 +49,11 @@ Requests from the frontend to `/api/*` are proxied by Vite to Rails, so use rela
 ## Health check
 
 `GET /up` returns JSON: `200` when the app and database are healthy, `503` otherwise (Kamal and load
-balancers only look at the status code). In development it also includes host metrics — CPU, memory,
-disk usage and I/O, network interfaces, and the Rails process — which the dashboard polls every 5s.
+balancers only look at the status code). It also includes host metrics — CPU, memory,
+disk usage and I/O, network interfaces, and the Rails process — for a signed-in user; the dashboard polls it every 5s.
 
-In production metrics are withheld unless the request sends `X-Health-Token` matching the
-`HEALTH_METRICS_TOKEN` environment variable, so host details aren't public. Metrics are read from
+Signed-out requests get only the status. An external monitor can still get metrics in production by
+sending `X-Health-Token` matching the `HEALTH_METRICS_TOKEN` environment variable. Metrics are read from
 `/proc` and `/sys`, so they're Linux-only; elsewhere those sections are `null`.
 
 ## Documents (encrypted file store)

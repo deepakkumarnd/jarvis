@@ -24,7 +24,16 @@ RSpec.describe "Health check", type: :request do
     expect(json.dig("checks", "database")).to eq("status" => "error", "error" => "ActiveRecord::ConnectionNotEstablished")
   end
 
-  context "in production" do
+  context "when signed out", signed_out: true do
+    it "omits metrics" do
+      get "/up"
+
+      expect(response).to have_http_status(:ok)
+      expect(json).not_to have_key("metrics")
+    end
+  end
+
+  context "in production", signed_out: true do
     before do
       allow(Rails).to receive(:env).and_return(ActiveSupport::EnvironmentInquirer.new("production"))
       stub_const("ENV", ENV.to_h.merge("HEALTH_METRICS_TOKEN" => "s3cret"))
