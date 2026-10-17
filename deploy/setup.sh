@@ -5,7 +5,7 @@
 #   deploy/setup.sh
 #
 # Override defaults with environment variables, e.g.
-#   SERVER_NAMES="jarvis.local 192.168.1.48 localhost" APP_PORT=3000 deploy/setup.sh
+#   SERVER_NAMES="jarvis.local 192.168.1.48 localhost" APP_PORT=8080 deploy/setup.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -13,7 +13,7 @@ RUN_USER="$(id -un)"
 RUN_GROUP="$(id -gn)"
 LAN_IP="$(ip -4 route get 1.1.1.1 2>/dev/null | grep -oP 'src \K\S+' || true)"
 SERVER_NAMES="${SERVER_NAMES:-$(hostname -s).local ${LAN_IP} localhost 127.0.0.1}"
-APP_PORT="${APP_PORT:-3000}"
+APP_PORT="${APP_PORT:-8080}"
 WEB_ROOT="${WEB_ROOT:-/var/www/jarvis}"
 SSL_DIR=/etc/nginx/ssl
 RUBY_VERSION="$(cat "$ROOT/backend/.ruby-version" | sed 's/^ruby-//')"

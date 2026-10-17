@@ -171,7 +171,7 @@ sign in.
 
 ## Deploy on your home network (nginx + HTTPS)
 
-Production runs on this machine as a systemd service (Puma on `127.0.0.1:3000`) behind nginx, which
+Production runs on this machine as a systemd service (Puma on `127.0.0.1:8080`) behind nginx, which
 serves the built frontend and terminates HTTPS. The certificate comes from a local certificate
 authority made with [mkcert](https://github.com/FiloSottile/mkcert), and nginx only answers devices on
 private (home) networks.
